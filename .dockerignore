@@ -1,0 +1,8 @@
+target
+.git
+.github
+.idea
+.vscode
+terraform
+k8s
+README.md
