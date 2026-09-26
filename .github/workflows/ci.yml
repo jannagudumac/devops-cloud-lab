@@ -5,8 +5,12 @@ on:
     branches: ["main"]
   pull_request:
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
-  test-and-build:
+  test-build-push:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,5 +30,23 @@ jobs:
       - name: Build application
         run: mvn --batch-mode package -DskipTests
 
+      - name: Log in to GitHub Container Registry
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build Docker image
-        run: docker build -t devops-cloud-lab:${{ github.sha }} .
+        run: |
+          docker build \
+            -t ghcr.io/${{ github.repository_owner }}/devops-cloud-lab:${{ github.sha }} \
+            -t ghcr.io/${{ github.repository_owner }}/devops-cloud-lab:latest \
+            .
+
+      - name: Push Docker image
+        if: github.event_name == 'push'
+        run: |
+          docker push ghcr.io/${{ github.repository_owner }}/devops-cloud-lab:${{ github.sha }}
+          docker push ghcr.io/${{ github.repository_owner }}/devops-cloud-lab:latest
