@@ -671,15 +671,3 @@ Future improvements could include:
 - AWS ECS or EKS
 - centralized logs
 ```
-
-A small improvement I’d make before you push it publicly: add actual screenshots under something like:
-
-```text
-docs/
-├── github-actions.png
-├── grafana.png
-├── kubernetes-pods.png
-└── terraform-apply.png
-```
-
-Then add a short **Screenshots** section near the top. Recruiters are much more likely to understand the project in 20 seconds if they can literally see green CI, Grafana, Kubernetes pods, and Terraform output. 
