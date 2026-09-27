@@ -1007,3 +1007,17 @@ security scan
    ↓
 GHCR
 
+# Delete the AWS infrastructure when done testing
+
+terraform destroy
+
+We just removed:
+
+EC2 instance
+Security Group
+
+terraform apply
+= create infrastructure
+
+terraform destroy
+= remove infrastructure
