@@ -1,5 +1,6 @@
 provider "aws" {
   region = var.aws_region
+  profile = "terraform-lab"
 }
 
 data "aws_ssm_parameter" "amazon_linux_2023" {

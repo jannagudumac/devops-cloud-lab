@@ -4,4 +4,4 @@ metadata:
   name: devops-lab-config
   namespace: devops-lab
 data:
-  APP_MESSAGE: "Hello from Kubernetes"
+  APP_MESSAGE: "Hello from Kubernetes v2"
