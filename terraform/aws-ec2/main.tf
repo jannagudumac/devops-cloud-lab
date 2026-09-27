@@ -32,10 +32,29 @@ resource "aws_security_group" "app" {
 }
 
 resource "aws_instance" "app" {
+  
   ami                    = data.aws_ssm_parameter.amazon_linux_2023.value
   instance_type          = "t3.micro"
   vpc_security_group_ids = [aws_security_group.app.id]
 
+  user_data_replace_on_change = true
+
+  user_data = <<-EOF
+    #!/bin/bash
+    dnf update -y
+    dnf install -y docker
+
+    systemctl enable docker
+    systemctl start docker
+
+    docker pull ghcr.io/jannagudumac/devops-cloud-lab:latest
+
+    docker run -d \
+      --name devops-cloud-lab \
+      --restart unless-stopped \
+      -p 8080:8080 \
+      ghcr.io/jannagudumac/devops-cloud-lab:latest
+  EOF
   tags = {
     Name    = var.project_name
     Project = var.project_name

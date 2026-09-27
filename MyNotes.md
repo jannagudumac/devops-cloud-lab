@@ -880,4 +880,32 @@ AWS
    └── EC2 Linux server
           public IP: 13.38.43.88
 
-          But the server is basically empty right now. Next we make Terraform configure it automatically so it installs Docker and runs your GHCR image.
+But the server is basically empty right now. Next we make Terraform configure it automatically so it installs Docker and runs our GHCR image.*
+
+## Make sure the package on GitHub is public:
+
+Packages → devops-cloud-lab → Package settings → Change visibility → Public.
+
+## Then edit the aws_instance "app" block in terraform/aws-ec2/main.tf. 
+
+Add this inside it:
+
+user_data_replace_on_change = true
+
+  user_data = <<-EOF
+    #!/bin/bash
+    dnf update -y
+    dnf install -y docker
+
+    systemctl enable docker
+    systemctl start docker
+
+    docker pull ghcr.io/jannagudumac/devops-cloud-lab:latest
+
+    docker run -d \
+      --name devops-cloud-lab \
+      --restart unless-stopped \
+      -p 8080:8080 \
+      ghcr.io/jannagudumac/devops-cloud-lab:latest
+  EOF
+
