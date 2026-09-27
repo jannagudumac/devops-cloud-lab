@@ -670,4 +670,3 @@ Future improvements could include:
 - AWS ECR
 - AWS ECS or EKS
 - centralized logs
-```
