@@ -682,4 +682,4 @@ docs/
 └── terraform-apply.png
 ```
 
-Then add a short **Screenshots** section near the top. Recruiters are much more likely to understand the project in 20 seconds if they can literally see green CI, Grafana, Kubernetes pods, and Terraform output.
+Then add a short **Screenshots** section near the top. Recruiters are much more likely to understand the project in 20 seconds if they can literally see green CI, Grafana, Kubernetes pods, and Terraform output. 
