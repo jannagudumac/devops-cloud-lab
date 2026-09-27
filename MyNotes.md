@@ -909,3 +909,101 @@ user_data_replace_on_change = true
       ghcr.io/jannagudumac/devops-cloud-lab:latest
   EOF
 
+## Run: terraform plan
+RESULT:
+Plan: 1 to add, 0 to change, 1 to destroy.
+
+Terraform is not destroying my whole setup. It will:
+- keep the existing security group
+- destroy the old EC2 instance
+- create a new EC2 instance with the user_data startup script
+
+REASON: + user_data = ... # forces replacement AND
+user_data_replace_on_change = false -> true
+
+Terraform is saying:
+“This EC2 instance was created without that startup script. Since you now want startup configuration to be part of the instance, I need to replace it.”
+
+The new instance will boot and automatically run:
+dnf install -y docker
+systemctl start docker
+docker pull ghcr.io/jannagudumac/devops-cloud-lab:latest
+docker run ...
+
+## run: terraform apply -> EC2 instance is live!
+RESULT:
+
+Apply complete! Resources: 1 added, 0 changed, 1 destroyed.
+
+Outputs:
+
+public_ip = "13.36.170.131"
+
+## Check whether the startup script installed Docker and launched my app
+
+http://13.36.170.131:8080/api/message
+
+{
+  "message": "Hello from DevOps Cloud Lab"
+}
+
+## Terraform flow:
+
+GitHub source code
+   ↓
+GitHub Actions
+   ↓
+Docker image
+   ↓
+GHCR
+   ↓
+Terraform creates EC2
+   ↓
+EC2 startup script installs Docker
+   ↓
+Docker pulls your image
+   ↓
+Spring Boot runs on AWS
+
+# Bonus: add security scanning to CI (Trivy)
+
+In .github/workflows/ci.yml after Build Docker image and before Push Docker Image add:
+
+- name: Scan Docker image
+  uses: aquasecurity/trivy-action@master
+  with:
+    image-ref: ghcr.io/${{ github.repository_owner }}/devops-cloud-lab:latest
+    format: table
+    exit-code: 0
+    severity: CRITICAL,HIGH
+
+build image
+   ↓
+scan image
+   ↓
+push image
+
+NOTE: with exit-code: 0 Trivy will report vulnerabilities but not fail the CI.
+
+## With security added: 
+Docker image
+     ↓
+Trivy
+     ↓
+checks installed libraries/packages
+     ↓
+finds known vulnerabilities
+
+## CI becomes:
+git push
+   ↓
+tests
+   ↓
+build
+   ↓
+Docker image
+   ↓
+security scan
+   ↓
+GHCR
+
